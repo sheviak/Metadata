@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Metadata"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="350" Width="550"
         
         xmlns:viewmodel="clr-namespace:Metadata.ViewModel"
         BorderBrush="Black"
-        BorderThickness="1"
+        BorderThickness="0.75"
         WindowStyle="None"
         ResizeMode="CanResizeWithGrip"
         AllowsTransparency="True"
@@ -21,20 +21,24 @@
     <Window.DataContext>
         <viewmodel:MainViewModel />
     </Window.DataContext>
-    
+
+    <Window.InputBindings>
+        <KeyBinding Key="E" Modifiers="Ctrl" Command="{Binding CloseProgram}" />
+        <KeyBinding Key="A" Modifiers="Ctrl" Command="{Binding OpenDir}" />
+    </Window.InputBindings>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
-
+        
         <!-- ОбЪеденение для перетаскивания -->
         <Grid Grid.Row="0" Background="{DynamicResource MaterialDesignPaper}" MouseLeftButtonDown="Grid_MouseLeftButtonDown" />
 
         <Menu Grid.Row="0" Width="135" HorizontalAlignment="Left">
             <MenuItem Header="_File">
-                <MenuItem Header="Open library" />
+                <MenuItem Header="Open library" Command="{Binding OpenDir}" />
                 <MenuItem Header="Save">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="ContentSave" />
@@ -66,7 +70,39 @@
                 <materialDesign:PackIcon Kind="WindowClose" Height="25" Width="25" Foreground="LightSlateGray" />
             </Button>
         </StackPanel>
-        <Separator Grid.Row="0" VerticalAlignment="Bottom" />
+        <Separator Grid.Row="0" VerticalAlignment="Bottom" Margin="0"  />
 
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="150" Width="200" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Catalog" Margin="5 8 0 10" Style="{StaticResource MaterialDesignHeadlineTextBlock}" />
+                <ListBox IsEnabled="{Binding IsChecked, ElementName=EnableListBox}" ItemsSource="{Binding Files}" />
+            </StackPanel>
+            
+            <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+
+            <StackPanel Grid.Column="2">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Information" Margin="5 8 0 10" Style="{StaticResource MaterialDesignHeadlineTextBlock}" />
+                    <Button Style="{StaticResource MaterialDesignToolButton}" Margin="10 0 8 0" Command="{Binding ExportFileInfo}">
+                        <materialDesign:PackIcon Kind="FileExport" Height="25" Width="25" Foreground="LightSlateGray" />
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignToolButton}" Margin="10 0 8 0" Command="{Binding CopyFileInfo}">
+                        <materialDesign:PackIcon Kind="ContentCopy" Height="25" Width="25" Foreground="LightSlateGray" />
+                    </Button>
+                </StackPanel>
+                <ListBox IsEnabled="{Binding IsChecked, ElementName=EnableListBox}">
+                    <TextBlock> Plain</TextBlock>
+                    <TextBlock>  Old</TextBlock>
+                    <TextBlock>  ListBox</TextBlock>
+                    <TextBlock>  Full of junk</TextBlock>
+                </ListBox>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
