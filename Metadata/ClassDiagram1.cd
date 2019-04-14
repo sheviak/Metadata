@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Metadata.Data.BaseFileInfo" Collapsed="true">
+    <Position X="3" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAgAAAAAAAAAAAAAAAgBAQEBAAAA=</HashCode>
+      <FileName>Data\BaseFileInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Metadata.Data.JPGInfo" Collapsed="true">
+    <Position X="4.75" Y="3.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>EAABABAA0AACIABAgAEQAAABSAAJJAIAAAEAAECDABQ=</HashCode>
+      <FileName>Data\JPGInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Metadata.Data.PDFInfo" Collapsed="true">
+    <Position X="3" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\PDFInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Metadata.Data.PNGInfo" Collapsed="true">
+    <Position X="1.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\PNGInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
