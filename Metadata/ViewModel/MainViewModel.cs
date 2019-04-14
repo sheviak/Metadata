@@ -49,6 +49,9 @@ namespace Metadata.ViewModel
             }
         }
 
+        /// <summary>
+        /// Свойство - индикатор происходящего (загрузка | сохранение)
+        /// </summary>
         private string _indicator;
         public string Indicator
         {
@@ -59,6 +62,10 @@ namespace Metadata.ViewModel
                 OnPropertyChanged("Indicator");
             }
         }
+
+        /// <summary>
+        /// Свойство - выбранный элемент из DataGrid
+        /// </summary>
         private dynamic _selectedItem;
         public dynamic SelItem
         {
@@ -86,7 +93,10 @@ namespace Metadata.ViewModel
                 OnPropertyChanged("SelItem");
             }
         }
-
+        
+        /// <summary>
+        /// Коллекция - содержащая подробную информацию о файле
+        /// </summary>
         private Dictionary<string, string> _getInfo;
         public Dictionary<string, string> GetInfo
         {
@@ -98,7 +108,7 @@ namespace Metadata.ViewModel
             }
         }
 
-        private ObservableCollection<BaseFileInfo> _files;
+        private ObservableCollection<BaseFileInfo> _files = new ObservableCollection<BaseFileInfo>();
         public ObservableCollection<BaseFileInfo> Files
         {
             get => _files;
@@ -219,7 +229,7 @@ namespace Metadata.ViewModel
         /// </summary>
         private async void SaveInLibrary()
         {
-            if (Files == null || Files.Count == 0)
+            if (Files.Count == 0)
                 return;
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
