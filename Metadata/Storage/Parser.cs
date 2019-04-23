@@ -14,7 +14,7 @@ namespace Metadata.Storage
             var Files = new ObservableCollection<BaseFileInfo>();
             if (file != "")
             {
-                string json = File.ReadAllText("3333.json");
+                string json = File.ReadAllText(file);
                 JArray jsonArray = JArray.Parse(json);
                 JToken jsonArray_Item = jsonArray.First;
                 while (jsonArray_Item != null)

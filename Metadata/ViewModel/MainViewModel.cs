@@ -85,6 +85,13 @@ namespace Metadata.ViewModel
                     return obj;
                 }
 
+                if (_selectedItem is PNGInfo)
+                {
+                    var obj = (PNGInfo)_selectedItem;
+                    GetInfo = obj.GetInformation();
+                    return obj;
+                }
+
                 return _selectedItem;
             }
             set
@@ -93,7 +100,7 @@ namespace Metadata.ViewModel
                 OnPropertyChanged("SelItem");
             }
         }
-        
+
         /// <summary>
         /// Коллекция - содержащая подробную информацию о файле
         /// </summary>
@@ -120,81 +127,13 @@ namespace Metadata.ViewModel
         }
 
         public MainViewModel() { }
-             
-        public void dd()
-        {
-
-            //Dictionary<string, List<object>> test = new Dictionary<string, List<object>>();
-
-            /*
-            test.Add("JPG", new ObservableCollection<Data.FileInfo>
-            {
-                new Data.JPG(name: "te", path: "sdf", tt: "sdf"),
-                new Data.JPG(name: "te", path: "sdf", tt: "sdf"),
-            });
-
-            test.Add("PNG", new ObservableCollection<Data.FileInfo>
-            {
-                new Data.PNG(name: "er", path: "qwe", tt: "ssdsdfdf", re: "sdf")
-            });
-            */
-            /*
-            JsonSerializer serializer = new JsonSerializer();
-            using (StreamWriter sw = new StreamWriter("test_2.json"))
-            {
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    serializer.Serialize(writer, test);
-                }
-            }
-            */
-
-
-            /*
-            // для диссериализации
-            string json = "";
-            json = File.ReadAllText("text.json");
-
-            var o = JObject.Parse(json);
-            var t1 = o["PNG"]
-                .Select(x => new Data.PNG
-                {
-                    FileName = x["FileName"].ToString(),
-                    FilePath = x["FilePath"].ToString(),
-                    sd       = x["sd"].ToString(),
-                    test     = x["test"].ToString()
-                }).ToList();
-
-            var t2 = o["JPG"]
-                .Select(x => new Data.JPG
-                {
-                    FileName = x["FileName"].ToString(),
-                    FilePath = x["FilePath"].ToString(),
-                    test = x["test"].ToString()
-                }).ToList();
-
-            // для сериализаии
-            Dictionary<string, List<Data.BaseFileInfo>> test = new Dictionary<string, List<Data.BaseFileInfo>>();
-            test.Add("PNG", new List<Data.BaseFileInfo>(t1));
-            test.Add("JPG", new List<Data.BaseFileInfo>(t2));
-
-            JsonSerializer ser = new JsonSerializer();
-            using (StreamWriter sw = new StreamWriter("trrr.json"))
-            {
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    ser.Serialize(writer, test);
-                }
-            }
-            */
-
-        }
 
         public ICommand CloseProgram => new RelayCommand(() => Environment.Exit(0));
         public ICommand MinimizedProgram => new RelayCommand(() => {
             var app = System.Windows.Application.Current.Windows[0];
             app.WindowState = WindowState.Minimized;
         });
+
         public ICommand OpenDir => new RelayCommand(() => GetAllFilesInFolder());
         public ICommand LoadLib => new RelayCommand(() => LoadInLibrary());
         public ICommand SaveAll => new RelayCommand(() => SaveInLibrary());
@@ -218,7 +157,6 @@ namespace Metadata.ViewModel
                         var t = new Parser();
                         Files = t.GetLibrary(openFileDialog.FileName);
                     });
-
                     OpenDialog = false;
                 });
             }
@@ -263,6 +201,7 @@ namespace Metadata.ViewModel
                     App.Current.Dispatcher.Invoke((Action)delegate { Files.Clear(); });
                     Indicator = "Load data...";
                     OpenDialog = true;
+                    PATH = folderBrowser.SelectedPath;
                     var allowedExtentions = new List<string>(new[] { ".png", ".jpg", ".pdf" });
                     var files = Directory
                         .GetFiles(folderBrowser.SelectedPath)
@@ -271,7 +210,7 @@ namespace Metadata.ViewModel
 
                     foreach (var s in files)
                     {
-                        System.Drawing.Icon icon = (System.Drawing.Icon)System.Drawing.Icon.ExtractAssociatedIcon(Path.GetFullPath(s));
+                        //System.Drawing.Icon icon = (System.Drawing.Icon)System.Drawing.Icon.ExtractAssociatedIcon(Path.GetFullPath(s));
                         switch (Path.GetExtension(s).ToLower())
                         {
                             case ".jpg":
@@ -279,7 +218,7 @@ namespace Metadata.ViewModel
                                 BitmapDecoder decoder = JpegBitmapDecoder.Create(Foto, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default); //"распаковали" снимок и создали объект decoder
                                 BitmapMetadata TmpImgEXIF = (BitmapMetadata)decoder.Frames[0].Metadata.Clone(); //считали и сохранили метаданные
                                 var o = new JPGInfo();
-                                o = o.GetAllJPGInfo(
+                                o = o.GetObject(
                                     TmpImgEXIF: TmpImgEXIF,
                                     length: Foto.Length,
                                     filename: Path.GetFileName(s),
@@ -294,12 +233,28 @@ namespace Metadata.ViewModel
                                 });
                                 break;
                             case ".png":
-                                //this.Files.Add(new PNGInfo());
+                                FileStream FotoPng = File.Open(s, FileMode.Open, FileAccess.Read, FileShare.Read);
+                                BitmapDecoder decoderPng = JpegBitmapDecoder.Create(FotoPng, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
+                                BitmapMetadata TmpImgEXIFPng = (BitmapMetadata)decoderPng.Frames[0].Metadata.Clone();
+                                var objPng = new PNGInfo();
+                                objPng = objPng.GetObject(
+                                    TmpImgEXIF: TmpImgEXIFPng,
+                                    length: FotoPng.Length,
+                                    filename: Path.GetFileName(s),
+                                    fullpath: Path.GetFullPath(s),
+                                    path: s
+                                );
+                                FotoPng.Close();
+                                App.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    objPng.FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative));
+                                    this.Files.Add(objPng);
+                                });
                                 break;
                             case ".pdf":
                                 PdfDocument document = PdfReader.Open(s);
                                 var obj = new PDFInfo();
-                                obj = obj.GetAllPDFInfo(
+                                obj = obj.GetObject(
                                     document: document,
                                     name: Path.GetFileName(s),
                                     fullpath: Path.GetFullPath(s)
@@ -317,6 +272,7 @@ namespace Metadata.ViewModel
         }
     }
 
+   
     internal static class IconUtilities
     {
         [DllImport("gdi32.dll", SetLastError = true)]

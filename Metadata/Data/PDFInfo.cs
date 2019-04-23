@@ -18,8 +18,7 @@ namespace Metadata.Data
 
         public PDFInfo() { }
 
-        // dynamic 
-        public PDFInfo GetAllPDFInfo(PdfDocument document, string name, string fullpath)
+        public PDFInfo GetObject(PdfDocument document, string name, string fullpath)
         {
             return new PDFInfo
             {

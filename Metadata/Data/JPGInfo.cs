@@ -54,7 +54,7 @@ namespace Metadata.Data
             };
         }
 
-        public JPGInfo GetAllJPGInfo(BitmapMetadata TmpImgEXIF, long length, string filename, string fullpath, string path)
+        public JPGInfo GetObject(BitmapMetadata TmpImgEXIF, long length, string filename, string fullpath, string path)
         {
             return new JPGInfo
             {
@@ -90,7 +90,7 @@ namespace Metadata.Data
             {
                 var text = TmpImgEXIF.GetQuery("/app1/ifd/{uint=270}").ToString();
                 text = Decode(text);
-                return text;
+                return text == "System.String[]" ? "" : text;
             }
             catch (Exception)
             {

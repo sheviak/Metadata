@@ -151,7 +151,7 @@
                 </ListView>
             </Grid>
             <Separator Grid.Row="2" VerticalAlignment="Top" Margin="0"  />
-            <TextBlock Grid.Row="2" Text="{Binding PATH}" FontSize="14" VerticalAlignment="Center" Margin="10 0 10 0"/>
+            <TextBlock Grid.Row="2" Text="{Binding PATH, StringFormat=Path: {0}}" FontSize="14" VerticalAlignment="Center" Margin="10 0 10 0"/>
         </Grid>
 
     </materialDesign:DialogHost>
