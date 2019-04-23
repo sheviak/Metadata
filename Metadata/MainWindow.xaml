@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Metadata"
         mc:Ignorable="d"
-        Title="Metadata" Height="450" Width="800"
+        Title="Metadata" Height="600" Width="900"
         
         xmlns:viewmodel="clr-namespace:Metadata.ViewModel"
         BorderBrush="Black"
@@ -47,7 +47,6 @@
             </StackPanel>
         </materialDesign:DialogHost.DialogContent>
 
-
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="50" />
@@ -58,11 +57,11 @@
             <!-- ОбЪеденение для перетаскивания -->
             <Grid Grid.Row="0" Background="{DynamicResource MaterialDesignPaper}" MouseLeftButtonDown="Grid_MouseLeftButtonDown" />
 
-            <Menu Grid.Row="0" Width="135" HorizontalAlignment="Left">
+            <Menu Grid.Row="0" HorizontalAlignment="Left">
                 <MenuItem Header="_File">
                     <MenuItem Header="Open folder" Command="{Binding OpenDir}" />
                     <MenuItem Header="Load library" Command="{Binding LoadLib}" />
-                    <MenuItem Header="Save">
+                    <MenuItem Header="Save" Command="{Binding SaveOne}">
                         <MenuItem.Icon>
                             <materialDesign:PackIcon Kind="ContentSave" />
                         </MenuItem.Icon>
@@ -77,9 +76,9 @@
                 </MenuItem>
 
                 <MenuItem Header="_About">
-                    <MenuItem Header="_Cut" Command="Cut">
+                    <MenuItem Header="Website" Command="{Binding OpenWebsite}">
                         <MenuItem.Icon>
-                            <materialDesign:PackIcon Kind="ContentCut" />
+                            <materialDesign:PackIcon Kind="Web" />
                         </MenuItem.Icon>
                     </MenuItem>
                 </MenuItem>
@@ -93,11 +92,11 @@
                     <materialDesign:PackIcon Kind="WindowClose" Height="25" Width="25" Foreground="LightSlateGray" />
                 </Button>
             </StackPanel>
-            <Separator Grid.Row="0" VerticalAlignment="Bottom" Margin="0"  />
+            <Separator Grid.Row="0" VerticalAlignment="Bottom" Margin="0 2" />
 
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="310" />
+                    <ColumnDefinition Width="350" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -131,7 +130,7 @@
 
                 <StackPanel Grid.Column="2" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="Information" Margin="8 0 0 0" Style="{StaticResource MaterialDesignHeadlineTextBlock}" />
-                    <Button Style="{StaticResource MaterialDesignToolButton}" Margin="10 0 8 0" Command="{Binding ExportFileInfo}">
+                    <Button Style="{StaticResource MaterialDesignToolButton}" Margin="10 0 8 0" Command="{Binding SaveOne}">
                         <materialDesign:PackIcon Kind="FileExport" Height="25" Width="25" Foreground="LightSlateGray" />
                     </Button>
                     <Button Style="{StaticResource MaterialDesignToolButton}" Margin="10 0 8 0" Command="{Binding CopyFileInfo}">

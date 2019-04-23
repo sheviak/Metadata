@@ -1,5 +1,7 @@
 ﻿using Metadata.Data;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 
@@ -16,6 +18,26 @@ namespace Metadata.Storage
                 {
                     ser.Serialize(writer, files);
                 }
+            }
+        }
+
+        public void SaveInformation(Dictionary<string, string> item, string path)
+        {
+            StreamWriter sw = new StreamWriter(path);
+            try
+            {
+                foreach (var t in item)
+                {
+                    sw.WriteLine(t.Key + "\t\t" + t.Value);
+                }
+            }
+            catch (Exception e)
+            {
+                System.Windows.MessageBox.Show(e.Message, "Exception");
+            }
+            finally
+            {
+                sw.Close();
             }
         }
     }

@@ -67,11 +67,29 @@ namespace Metadata.Storage
                             });
                             break;
                         case "PNG":
+                            Files.Add(new PNGInfo
+                            {
+                                FileDateCreated = jsonArray_Item.Value<string>("FileDateCreated"),
+                                FileDateModification = jsonArray_Item.Value<string>("FileDateModification"),
+                                RedX = jsonArray_Item.Value<string>("RedX"),
+                                RedY = jsonArray_Item.Value<string>("RedY"),
+                                GreenX = jsonArray_Item.Value<string>("GreenX"),
+                                GreenY = jsonArray_Item.Value<string>("GreenY"),
+                                BlueX = jsonArray_Item.Value<string>("BlueX"),
+                                BlueY = jsonArray_Item.Value<string>("BlueY"),
+                                WhitePointX = jsonArray_Item.Value<string>("WhitePointX"),
+                                WhitePointY = jsonArray_Item.Value<string>("WhitePointY"),
+                                FileSize = jsonArray_Item.Value<string>("FileSize"),
+                                FileName = jsonArray_Item.Value<string>("FileName"),
+                                FilePath = jsonArray_Item.Value<string>("FilePath"),
+                                FileImgSize = jsonArray_Item.Value<string>("FileImgSize"),
+                                FileType = type,
+                                FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative))
+                            });
                             break;
                         default:
                             break;
                     }
-                    //Be careful, you take the next from the current item, not from the JArray object. 
                     jsonArray_Item = jsonArray_Item.Next;
                 }
             }

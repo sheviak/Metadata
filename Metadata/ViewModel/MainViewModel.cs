@@ -18,11 +18,16 @@ using System.Windows.Media;
 using System.Drawing;
 using System.Windows.Interop;
 using Metadata.Storage;
+using System.Diagnostics;
 
 namespace Metadata.ViewModel
 {
     public class MainViewModel : ViewModelBase, INotifyPropertyChanged
     {
+        private const string link = "https://mssg.me/sheviak.k";
+        /// <summary>
+        /// Свойство отображающие путь к выбранной папке
+        /// </summary>
         private string _path = "";
         public string PATH
         {
@@ -115,6 +120,9 @@ namespace Metadata.ViewModel
             }
         }
 
+        /// <summary>
+        /// коллекция - содержащая все отсканированные объекты
+        /// </summary>
         private ObservableCollection<BaseFileInfo> _files = new ObservableCollection<BaseFileInfo>();
         public ObservableCollection<BaseFileInfo> Files
         {
@@ -137,8 +145,9 @@ namespace Metadata.ViewModel
         public ICommand OpenDir => new RelayCommand(() => GetAllFilesInFolder());
         public ICommand LoadLib => new RelayCommand(() => LoadInLibrary());
         public ICommand SaveAll => new RelayCommand(() => SaveInLibrary());
-        public ICommand ExportFileInfo => new RelayCommand(() => System.Windows.MessageBox.Show("File exported"));
-        public ICommand CopyFileInfo => new RelayCommand(() => System.Windows.MessageBox.Show("Info copied"));
+        public ICommand SaveOne => new RelayCommand(() => SaveInfoAboutFile());
+        public ICommand OpenWebsite => new RelayCommand(() => Process.Start(link));
+        public ICommand CopyFileInfo => new RelayCommand(() => CopyInfo());
 
         /// <summary>
         /// Метод загружающий все данные о файлах из библиотеки
@@ -154,8 +163,15 @@ namespace Metadata.ViewModel
                     OpenDialog = true;
                     App.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        var t = new Parser();
-                        Files = t.GetLibrary(openFileDialog.FileName);
+                        try
+                        {
+                            var t = new Parser();
+                            Files = t.GetLibrary(openFileDialog.FileName);
+                        }
+                        catch (Exception)
+                        {
+                            System.Windows.MessageBox.Show("Error parsing file", "Error!");
+                        }
                     });
                     OpenDialog = false;
                 });
@@ -188,6 +204,41 @@ namespace Metadata.ViewModel
             }
         }
 
+        private void CopyInfo()
+        {
+            if (Files.Count == 0 || SelItem == null)
+                return;
+
+            string c = "";
+            foreach (var item in GetInfo)
+            {
+                c += item.Key + "\t\t" + item.Value + "\n";
+            }
+            System.Windows.Clipboard.SetText(c);
+        }
+
+        private async void SaveInfoAboutFile()
+        {
+            if (Files.Count == 0)
+                return;
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "TXT files(*.txt)|*.txt";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                await Task.Run(() =>
+                {
+                    Indicator = "Save information...";
+                    OpenDialog = true;
+                    // получаем выбранный файл
+                    string filename = saveFileDialog.FileName;
+                    // сохраняем текст в файл
+                    var save = new Save();
+                    save.SaveInformation(GetInfo, filename);
+                    OpenDialog = false;
+                });
+            }
+        }
         /// <summary>
         /// Метод заполняющий коллекцию файлами
         /// </summary>
@@ -206,7 +257,6 @@ namespace Metadata.ViewModel
                     var files = Directory
                         .GetFiles(folderBrowser.SelectedPath)
                         .Where(f => allowedExtentions.Contains(Path.GetExtension(f)));
-                    //.Select(file => new { Name = Path.GetFileName(file), Url = PATH, FileExt = Path.GetExtension(file)});
 
                     foreach (var s in files)
                     {
@@ -214,41 +264,37 @@ namespace Metadata.ViewModel
                         switch (Path.GetExtension(s).ToLower())
                         {
                             case ".jpg":
-                                FileStream Foto = File.Open(s, FileMode.Open, FileAccess.Read, FileShare.Read); // открыли файл по адресу s для чтения
-                                BitmapDecoder decoder = JpegBitmapDecoder.Create(Foto, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default); //"распаковали" снимок и создали объект decoder
-                                BitmapMetadata TmpImgEXIF = (BitmapMetadata)decoder.Frames[0].Metadata.Clone(); //считали и сохранили метаданные
-                                var o = new JPGInfo();
-                                o = o.GetObject(
-                                    TmpImgEXIF: TmpImgEXIF,
-                                    length: Foto.Length,
+                                var jpg = GetValues(s);
+                                var objectJpg = new JPGInfo();
+                                objectJpg = objectJpg.GetObject(
+                                    TmpImgEXIF: jpg.metadata,
+                                    length: jpg.foto.Length,
                                     filename: Path.GetFileName(s),
                                     fullpath: Path.GetFullPath(s),
                                     path: s
                                 );
-                                Foto.Close();
+                                jpg.foto.Close();
                                 App.Current.Dispatcher.Invoke((Action)delegate
                                 {
-                                    o.FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative));
-                                    this.Files.Add(o);
+                                    objectJpg.FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative));
+                                    this.Files.Add(objectJpg);
                                 });
                                 break;
                             case ".png":
-                                FileStream FotoPng = File.Open(s, FileMode.Open, FileAccess.Read, FileShare.Read);
-                                BitmapDecoder decoderPng = JpegBitmapDecoder.Create(FotoPng, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
-                                BitmapMetadata TmpImgEXIFPng = (BitmapMetadata)decoderPng.Frames[0].Metadata.Clone();
-                                var objPng = new PNGInfo();
-                                objPng = objPng.GetObject(
-                                    TmpImgEXIF: TmpImgEXIFPng,
-                                    length: FotoPng.Length,
+                                var png = GetValues(s);
+                                var objectPng = new PNGInfo();
+                                objectPng = objectPng.GetObject(
+                                    TmpImgEXIF: png.metadata,
+                                    length: png.foto.Length,
                                     filename: Path.GetFileName(s),
                                     fullpath: Path.GetFullPath(s),
                                     path: s
                                 );
-                                FotoPng.Close();
+                                png.foto.Close();
                                 App.Current.Dispatcher.Invoke((Action)delegate
                                 {
-                                    objPng.FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative));
-                                    this.Files.Add(objPng);
+                                    objectPng.FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative));
+                                    this.Files.Add(objectPng);
                                 });
                                 break;
                             case ".pdf":
@@ -270,8 +316,21 @@ namespace Metadata.ViewModel
                 });
             }
         }
-    }
 
+        /// <summary>
+        /// Метод возвращаюший кортеж из потока FileStream и фрейма из BitmapMetadata
+        /// </summary>
+        /// <param name="s">Путь</param>
+        /// <returns>Возврат объектов FileStream и BitmapMetadata</returns>
+        private (FileStream foto, BitmapMetadata metadata) GetValues(string s)
+        {
+            FileStream Foto = File.Open(s, FileMode.Open, FileAccess.Read, FileShare.Read);
+            BitmapDecoder decoder = JpegBitmapDecoder.Create(Foto, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
+            BitmapMetadata TmpImgEXIF = (BitmapMetadata)decoder.Frames[0].Metadata.Clone();
+
+            return (foto: Foto, metadata: TmpImgEXIF);
+        }
+    }
    
     internal static class IconUtilities
     {
