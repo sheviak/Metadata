@@ -13,10 +13,6 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-using System.Runtime.InteropServices;
-using System.Windows.Media;
-using System.Drawing;
-using System.Windows.Interop;
 using Metadata.Storage;
 using System.Diagnostics;
 
@@ -148,6 +144,7 @@ namespace Metadata.ViewModel
         public ICommand SaveOne => new RelayCommand(() => SaveInfoAboutFile());
         public ICommand OpenWebsite => new RelayCommand(() => Process.Start(link));
         public ICommand CopyFileInfo => new RelayCommand(() => CopyInfo());
+        public ICommand OpenFile => new RelayCommand(() => OpenFileInProgramm());
 
         /// <summary>
         /// Метод загружающий все данные о файлах из библиотеки
@@ -239,6 +236,22 @@ namespace Metadata.ViewModel
                 });
             }
         }
+
+        /// <summary>
+        /// Открытие файла ассоциированной с ним программой
+        /// </summary>
+        private void OpenFileInProgramm()
+        {
+            try
+            {
+                Process.Start(((BaseFileInfo)SelItem).FilePath);
+            }
+            catch (Exception)
+            {
+                System.Windows.Forms.MessageBox.Show("No file in this way!");
+            }
+        }
+
         /// <summary>
         /// Метод заполняющий коллекцию файлами
         /// </summary>
@@ -260,7 +273,6 @@ namespace Metadata.ViewModel
 
                     foreach (var s in files)
                     {
-                        //System.Drawing.Icon icon = (System.Drawing.Icon)System.Drawing.Icon.ExtractAssociatedIcon(Path.GetFullPath(s));
                         switch (Path.GetExtension(s).ToLower())
                         {
                             case ".jpg":
@@ -329,31 +341,6 @@ namespace Metadata.ViewModel
             BitmapMetadata TmpImgEXIF = (BitmapMetadata)decoder.Frames[0].Metadata.Clone();
 
             return (foto: Foto, metadata: TmpImgEXIF);
-        }
-    }
-   
-    internal static class IconUtilities
-    {
-        [DllImport("gdi32.dll", SetLastError = true)]
-        private static extern bool DeleteObject(IntPtr hObject);
-
-        public static ImageSource ToImageSource(this Icon icon)
-        {
-            Bitmap bitmap = icon.ToBitmap();
-            IntPtr hBitmap = bitmap.GetHbitmap();
-
-            ImageSource wpfBitmap = Imaging.CreateBitmapSourceFromHBitmap(
-                hBitmap,
-                IntPtr.Zero,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
-
-            if (!DeleteObject(hBitmap))
-            {
-                throw new Win32Exception();
-            }
-
-            return wpfBitmap;
         }
     }
 }
