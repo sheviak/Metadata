@@ -276,51 +276,63 @@ namespace Metadata.ViewModel
                         switch (Path.GetExtension(s).ToLower())
                         {
                             case ".jpg":
-                                var jpg = GetValues(s);
-                                var objectJpg = new JPGInfo();
-                                objectJpg = objectJpg.GetObject(
-                                    TmpImgEXIF: jpg.metadata,
-                                    length: jpg.foto.Length,
-                                    filename: Path.GetFileName(s),
-                                    fullpath: Path.GetFullPath(s),
-                                    path: s
-                                );
-                                jpg.foto.Close();
-                                App.Current.Dispatcher.Invoke((Action)delegate
+                                try
                                 {
-                                    objectJpg.FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative));
-                                    this.Files.Add(objectJpg);
-                                });
+                                    var jpg = GetValues(s);
+                                    var objectJpg = new JPGInfo();
+                                    objectJpg = objectJpg.GetObject(
+                                        TmpImgEXIF: jpg.metadata,
+                                        length: jpg.foto.Length,
+                                        filename: Path.GetFileName(s),
+                                        fullpath: Path.GetFullPath(s),
+                                        path: s
+                                    );
+                                    jpg.foto.Close();
+                                    App.Current.Dispatcher.Invoke((Action)delegate
+                                    {
+                                        objectJpg.FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative));
+                                        this.Files.Add(objectJpg);
+                                    });
+                                }
+                                catch { }
                                 break;
                             case ".png":
-                                var png = GetValues(s);
-                                var objectPng = new PNGInfo();
-                                objectPng = objectPng.GetObject(
-                                    TmpImgEXIF: png.metadata,
-                                    length: png.foto.Length,
-                                    filename: Path.GetFileName(s),
-                                    fullpath: Path.GetFullPath(s),
-                                    path: s
-                                );
-                                png.foto.Close();
-                                App.Current.Dispatcher.Invoke((Action)delegate
+                                try
                                 {
-                                    objectPng.FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative));
-                                    this.Files.Add(objectPng);
-                                });
+                                    var png = GetValues(s);
+                                    var objectPng = new PNGInfo();
+                                    objectPng = objectPng.GetObject(
+                                        TmpImgEXIF: png.metadata,
+                                        length: png.foto.Length,
+                                        filename: Path.GetFileName(s),
+                                        fullpath: Path.GetFullPath(s),
+                                        path: s
+                                    );
+                                    png.foto.Close();
+                                    App.Current.Dispatcher.Invoke((Action)delegate
+                                    {
+                                        objectPng.FileIcon = new BitmapImage(new Uri("Icons/image.png", UriKind.Relative));
+                                        this.Files.Add(objectPng);
+                                    });
+                                }
+                                catch { }
                                 break;
                             case ".pdf":
-                                PdfDocument document = PdfReader.Open(s);
-                                var obj = new PDFInfo();
-                                obj = obj.GetObject(
-                                    document: document,
-                                    name: Path.GetFileName(s),
-                                    fullpath: Path.GetFullPath(s)
-                                );
-                                App.Current.Dispatcher.Invoke((Action)delegate {
-                                    obj.FileIcon = new BitmapImage(new Uri("Icons/pdf.png", UriKind.Relative));
-                                    this.Files.Add(obj);
-                                });
+                                try
+                                {
+                                    PdfDocument document = PdfReader.Open(s);
+                                    var obj = new PDFInfo();
+                                    obj = obj.GetObject(
+                                        document: document,
+                                        name: Path.GetFileName(s),
+                                        fullpath: Path.GetFullPath(s)
+                                    );
+                                    App.Current.Dispatcher.Invoke((Action)delegate {
+                                        obj.FileIcon = new BitmapImage(new Uri("Icons/pdf.png", UriKind.Relative));
+                                        this.Files.Add(obj);
+                                    });
+                                }
+                                catch { }
                                 break;
                         }
                     }
