@@ -5,7 +5,6 @@ namespace Metadata.ViewModel
 {
     public class ViewModelBase : INotifyPropertyChanged
     {
-
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName]string prop = "")
         {
